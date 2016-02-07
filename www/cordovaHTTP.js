@@ -19,6 +19,9 @@ var http = {
     acceptAllCerts: function(allow, success, failure) {
         return exec(success, failure, "CordovaHttpPlugin", "acceptAllCerts", [allow]);
     },
+    acceptAllHosts: function(allow, success, failure) {
+        return exec(success, failure, "CordovaHttpPlugin", "acceptAllHosts", [allow]);
+    },
     post: function(url, params, headers, success, failure) {
         return exec(success, failure, "CordovaHttpPlugin", "post", [url, params, headers]);
     },
@@ -52,11 +55,13 @@ var http = {
          *
         */
         var win = function(result) {
-            var entry = new (require('org.apache.cordova.file.FileEntry'))();
+            var entry = new (require('cordova-plugin-file.FileEntry'))();
             entry.isDirectory = false;
             entry.isFile = true;
             entry.name = result.file.name;
             entry.fullPath = result.file.fullPath;
+            entry.filesystem = new FileSystem(result.file.filesystemName || (result.file.filesystem == window.PERSISTENT ? 'persistent' : 'temporary'));
+            entry.nativeURL = result.file.nativeURL;
             success(entry);
         };
         return exec(win, failure, "CordovaHttpPlugin", "downloadFile", [url, params, headers, filePath]);
